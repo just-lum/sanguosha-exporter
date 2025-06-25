@@ -144,13 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        statusDiv.innerHTML = `正在准备下载 ${selectedItems.length} 张图片...`;
+        statusDiv.innerHTML = `正在准备下载 ${selectedItems.length} 张图片... (首次使用可能需要点击<a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" rel="noopener noreferrer">此处</a>激活代理)`;
         downloadButton.disabled = true;
 
         try {
             if (typeof JSZip === 'undefined') throw new Error('JSZip库未加载');
             
             const zip = new JSZip();
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/'; // 使用CORS代理
             
             const fetchPromises = Array.from(selectedItems).map(async item => {
                 const imgElement = item.querySelector('img');
@@ -160,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const packageName = path.substring(0, path.lastIndexOf('/'));
 
                 try {
-                    const response = await fetch(imageUrl);
+                    const response = await fetch(proxyUrl + imageUrl); // 通过代理请求
                     if (!response.ok) throw new Error(`无法下载 ${fileName}`);
                     const blob = await response.blob();
                     zip.file(`${packageName}_${fileName}`, blob);
